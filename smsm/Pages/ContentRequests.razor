@@ -1,0 +1,133 @@
+﻿@page "/Requests"
+
+@using smsm.Data.Models
+@using smsm.Data.Services
+@inject ContentService contentService
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Requests</PageTitle>
+
+@*<div class="container">*@
+@if (contentRequestForm)
+{
+    <h3>New Content Request</h3>
+
+    <form @onsubmit="SaveNewContentRequest">
+        <div class="card-custom">
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="newContentRequestTypeInput">Type</label>
+                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequest.Type">
+                            <option value="Movie">Movie</option>
+                            <option value="TV Series">TV Series</option>
+                            <option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentRequestTitleInput">Title</label>
+                        <input type="text" class="form-control" id="newContentRequestTitleInput" @bind-value="contentRequest.Title">
+                    </div>
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentRequestYearInput">Year</label>
+                        @*<input type="text" class="form-control" id="newContentRequestYearInput" @bind-value="contentRequest.Year">*@
+                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequest.Year">
+                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) {                                
+                                <option value="@i">@i</option>
+                            }                            
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentRequestCommentsInput">Comments</label>
+                        <input type="text" class="form-control" id="newContentRequestCommentsInput" @bind-value="contentRequest.Comments">
+                    </div>
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentRequestImdbIdInput">IMDB ID</label>
+                        <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequest.ImdbId">
+                    </div>
+                </div><div class="row">
+                    <div class="form-group col-lg-6 col-sm-12 mt-3">
+                        <input type="submit" class="btn custom-button-primary" value="Submit" />
+                        <input type="button" class="btn custom-button-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    @if (contentRequests == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <button type="button" @onclick="ShowHideContentRequestForm" class="btn btn-primary mb-3">New Request</button>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Year</th>
+                    <th>Comments</th>
+                    <th>IMDB ID</th>
+                    <th>Complete</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var contentRequest in contentRequests)
+                {
+                    <tr>
+                        <td>@contentRequest.CreatedDateTime.ToShortDateString()</td>
+                        <td>@contentRequest.Type</td>
+                        <td>@contentRequest.Title</td>
+                        <td>@contentRequest.Year</td>
+                        <td>@contentRequest.Comments</td>
+                        <td><a href="https://www.imdb.com/title/@contentRequest.ImdbId" target="_blank">@contentRequest.ImdbId</a></td>
+                        <td>
+                            @if (@contentRequest.IsComplete)
+                            {
+                                <span class="oi oi-check" style="color:green"></span>
+                            }
+                            else
+                            {
+                                <span class="oi oi-x" style="color: red"></span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+@*</div>*@
+
+@code {
+    public bool contentRequestForm = false;
+    private List<ContentRequest>? contentRequests;
+    private ContentRequest contentRequest = new ContentRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentRequests = await contentService.GetContentRequestsAsync();
+    }
+
+    private async Task SaveNewContentRequest()
+    {
+        contentRequests = await contentService.SaveContentRequest(contentRequest);
+        ShowHideContentRequestForm();
+    }
+
+    private void ShowHideContentRequestForm()
+    {
+        contentRequestForm = !contentRequestForm;
+        contentRequest = new ContentRequest();
+    }
+}
