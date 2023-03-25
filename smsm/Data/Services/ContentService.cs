@@ -6,47 +6,87 @@ namespace smsm.Data.Services
     public class ContentService
     {
         private ApplicationDbContext database;
+        private LogService logService;
 
-        public ContentService(ApplicationDbContext database)
+        public ContentService(ApplicationDbContext database, LogService logService)
         {
             this.database = database;
+            this.logService = logService;
         }
 
         public async Task<List<ContentRequest>> GetContentRequestsAsync()
-        {
-            ContentRequest contentRequest = new ContentRequest()
-            {
-                Title = "Harry Potter and the Philiosophers Stone",
-                Year = "2001",
-                ImdbId = "tt0241527",
-                CreatedDateTime = DateTime.Now,
-                Type = "Movie",
-                Comments = "Also known as Harry Potter and the Sorcerer's Stone",
-                IsComplete = true,
-                Archived = false,
-            };
-
-
-
-            return await database.ContentRequests.OrderBy(x=> x.IsComplete).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+        {            
+            return await database.ContentRequests.Where(x => !x.Archived).OrderBy(x=> x.IsComplete).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
         }
 
         public async Task<List<ContentRequest>> SaveContentRequest(ContentRequest contentRequest)
         {
             try
             {
-                contentRequest.CreatedDateTime = DateTime.Now;
-                contentRequest.Archived = false;
+                if (contentRequest.Id == 0)
+                {
+                    contentRequest.CreatedDateTime = DateTime.Now;
+                    contentRequest.Archived = false;
+                    contentRequest.Type = contentRequest.Type == null ? "" : contentRequest.Type;
+                    contentRequest.Title = contentRequest.Title == null ? "" : contentRequest.Title;
+                    contentRequest.Year = contentRequest.Year == null ? "" : contentRequest.Year;
+                    contentRequest.ImdbId = contentRequest.ImdbId == null ? "" : contentRequest.ImdbId;
+                    contentRequest.UserName = "";
+                    contentRequest.UserId = 0;
 
-                database.Add(contentRequest);
-                database.SaveChangesAsync();
+                    database.Add(contentRequest);
+                    logService.CreateLog("New Content Request", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year}.");
+                }
+                else
+                {
+                    database.Update(contentRequest);
+                    var existingContentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == contentRequest.Id);
+                    logService.CreateLog("Content Request Updated", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year}.");
+                }
 
-                return await database.ContentRequests.OrderBy(x => x.IsComplete).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+                await database.SaveChangesAsync();
+
+
+                return await GetContentRequestsAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return await database.ContentRequests.OrderBy(x => x.IsComplete).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+                return await GetContentRequestsAsync();
             }
         }
+
+        public async Task<List<ContentRequest>> ChangeContentRequestStatus(int id)
+        {
+            var contentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == id);
+            contentRequest.IsComplete = !contentRequest.IsComplete;
+
+            if (contentRequest.IsComplete)
+            {
+                logService.CreateLog("Content Request Complete", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as completed.");
+            }
+            else
+            {
+                logService.CreateLog("Content Request Incomplete", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as incompleted.");
+            }
+
+            database.Update(contentRequest);
+            await database.SaveChangesAsync();
+
+            return await GetContentRequestsAsync();
+        }    
+
+        public async Task<List<ContentRequest>> DeleteContentRequest(ContentRequest contentRequest)
+        {
+            contentRequest.Archived = true;
+
+            database.Update(contentRequest);
+            await database.SaveChangesAsync();
+
+            logService.CreateLog("Content Request Deleted", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as deleted.");
+
+            return await GetContentRequestsAsync();
+        }        
+        
+
     }
 }

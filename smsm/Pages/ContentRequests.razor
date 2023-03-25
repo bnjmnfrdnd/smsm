@@ -18,7 +18,8 @@
                 <div class="row">
                     <div class="form-group col-12">
                         <label for="newContentRequestTypeInput">Type</label>
-                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequest.Type">
+                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequestModel.Type">
+                            <option value=""></option>
                             <option value="Movie">Movie</option>
                             <option value="TV Series">TV Series</option>
                             <option value="Documentary">Documentary</option>
@@ -28,12 +29,11 @@
                 <div class="row">
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestTitleInput">Title</label>
-                        <input type="text" class="form-control" id="newContentRequestTitleInput" @bind-value="contentRequest.Title">
+                        <input type="text" class="form-control" id="newContentRequestTitleInput" @bind-value="contentRequestModel.Title">
                     </div>
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestYearInput">Year</label>
-                        @*<input type="text" class="form-control" id="newContentRequestYearInput" @bind-value="contentRequest.Year">*@
-                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequest.Year">
+                        <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequestModel.Year">
                             @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) {                                
                                 <option value="@i">@i</option>
                             }                            
@@ -43,16 +43,16 @@
                 <div class="row">
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestCommentsInput">Comments</label>
-                        <input type="text" class="form-control" id="newContentRequestCommentsInput" @bind-value="contentRequest.Comments">
+                        <input type="text" class="form-control" id="newContentRequestCommentsInput" @bind-value="contentRequestModel.Comments">
                     </div>
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestImdbIdInput">IMDB ID</label>
-                        <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequest.ImdbId">
+                        <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequestModel.ImdbId">
                     </div>
                 </div><div class="row">
                     <div class="form-group col-lg-6 col-sm-12 mt-3">
-                        <input type="submit" class="btn custom-button-primary" value="Submit" />
-                        <input type="button" class="btn custom-button-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
+                        <input type="submit" class="btn btn-primary" value="Submit" />
+                        <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
                     </div>
                 </div>
             </div>
@@ -67,7 +67,7 @@ else
     }
     else
     {
-        <button type="button" @onclick="ShowHideContentRequestForm" class="btn btn-primary mb-3">New Request</button>
+        <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -77,7 +77,9 @@ else
                     <th>Year</th>
                     <th>Comments</th>
                     <th>IMDB ID</th>
+                    <th>Requested by</th>
                     <th>Complete</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -90,16 +92,30 @@ else
                         <td>@contentRequest.Title</td>
                         <td>@contentRequest.Year</td>
                         <td>@contentRequest.Comments</td>
-                        <td><a href="https://www.imdb.com/title/@contentRequest.ImdbId" target="_blank">@contentRequest.ImdbId</a></td>
+                        <td><a href="https://www.imdb.com/title/@contentRequest.ImdbId" target="_blank">@(contentRequest.ImdbId == null ? "" : contentRequest.ImdbId.ToUpper())</a></td>
+                        <td>@contentRequest.UserName</td>
                         <td>
                             @if (@contentRequest.IsComplete)
                             {
-                                <span class="oi oi-check" style="color:green"></span>
+                                <span class="oi oi-circle-check" style="color:green"></span>
                             }
                             else
                             {
-                                <span class="oi oi-x" style="color: red"></span>
+                                <span class="oi oi-circle-x" style="color: red"></span>
                             }
+                        </td>
+
+                        <td>
+                            @if (@contentRequest.IsComplete)
+                            {
+                                <span class="oi oi-circle-x" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)" style="cursor:pointer; color: rebeccapurple"></span>
+                            }
+                            else
+                            {
+                                <span class="oi oi-circle-check" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)" style="cursor:pointer; color: rebeccapurple"></span>
+                            }
+                            <span class="oi oi-pencil" @onclick="() => ContentRequestForm(contentRequest)" style="cursor:pointer; color: rebeccapurple; margin-left: 25px;"></span>
+                            <span class="oi oi-trash" @onclick="() => DeleteContentRequest(contentRequest)" style="cursor:pointer; color: rebeccapurple; margin-left: 25px;"></span>
                         </td>
                     </tr>
                 }
@@ -112,7 +128,7 @@ else
 @code {
     public bool contentRequestForm = false;
     private List<ContentRequest>? contentRequests;
-    private ContentRequest contentRequest = new ContentRequest();
+    private ContentRequest contentRequestModel = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,13 +137,36 @@ else
 
     private async Task SaveNewContentRequest()
     {
-        contentRequests = await contentService.SaveContentRequest(contentRequest);
+        contentRequests = await contentService.SaveContentRequest(contentRequestModel);
+        contentRequestModel = null; 
+        ShowHideContentRequestForm();
+    }
+
+    private async Task DeleteContentRequest(ContentRequest contentRequest)
+    {
+        contentRequests = await contentService.DeleteContentRequest(contentRequest);
+    }
+
+    private void ContentRequestForm(ContentRequest contentRequest)
+    {
+        if (contentRequest == null)
+        {
+            contentRequestModel = new ContentRequest();
+        }
+        else
+        {
+            contentRequestModel = contentRequest;
+        }
         ShowHideContentRequestForm();
     }
 
     private void ShowHideContentRequestForm()
     {
         contentRequestForm = !contentRequestForm;
-        contentRequest = new ContentRequest();
+    }
+
+    private async void ChangeContentRequestStatus(int id)
+    {
+        contentRequests = await contentService.ChangeContentRequestStatus(id);
     }
 }

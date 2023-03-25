@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using smsm.Data.Models;
 
 namespace smsm.Data.Services
@@ -7,24 +8,34 @@ namespace smsm.Data.Services
     {
 
         private ApplicationDbContext database;
-        public LogService(ApplicationDbContext database)
+        UserManager<IdentityUser> userManager;
+
+        public LogService(ApplicationDbContext database, UserManager<IdentityUser> userManager)
         {
             this.database = database;
+            this.userManager = userManager;
+            var currentUserId = this.userManager.GetUserIdAsync;
         }
 
         public async Task<List<Log>> GetLogsAsync()
+        {           
+            return await database.Logs.OrderByDescending(x => x.CreatedDateTime).ToListAsync();
+        }
+
+        public void CreateLog(string type, string description)
         {
+            var currentUserId = this.userManager.GetUserIdAsync;
+
             Log log = new Log()
             {
+                Type = type,
+                Description = description,
                 CreatedDateTime = DateTime.Now,
-                Description = "This is a test log",
-                Type = "Test",
                 Archived = false,
             };
 
             database.Add(log);
-
-            return await database.Logs.OrderByDescending(x => x.CreatedDateTime).ToListAsync();
+            database.SaveChanges();
         }
     }
 }
