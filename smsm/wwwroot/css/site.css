@@ -121,9 +121,24 @@ input[type=text] {
     border-right: none;
     border-radius: 0px !important;
     opacity: 90%;
+    text-transform: capitalize;
 }
 
     input[type=text]:focus {
         box-shadow: none !important;
         border-radius: 0px !important;
     }
+
+.action-buttons {
+    cursor: pointer;
+    color: rebeccapurple;
+    margin-left: 25px;
+}
+
+.action-buttons:hover {
+    color: purple;
+}
+
+.column-sorted {
+    cursor: pointer;
+}

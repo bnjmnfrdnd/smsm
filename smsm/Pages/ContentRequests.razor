@@ -7,10 +7,9 @@
 
 <PageTitle>Requests</PageTitle>
 
-@*<div class="container">*@
 @if (contentRequestForm)
 {
-    <h3>New Content Request</h3>
+    <h3>@contentRequestFormTitle</h3>
 
     <form @onsubmit="SaveNewContentRequest">
         <div class="card-custom">
@@ -69,16 +68,17 @@ else
     {
         <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
         <table class="table table-striped">
+
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Title</th>
-                    <th>Year</th>
-                    <th>Comments</th>
-                    <th>IMDB ID</th>
-                    <th>Requested by</th>
-                    <th>Complete</th>
+                    <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Date</th>
+                    <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
+                    <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
+                    <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
+                    <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
+                    <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
+                    <th @onclick='() => FilterTable("REQUESTEDBY")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Requested by</th>
+                    <th @onclick='() => FilterTable("COMPLETE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Complete</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -108,14 +108,14 @@ else
                         <td>
                             @if (@contentRequest.IsComplete)
                             {
-                                <span class="oi oi-circle-x" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)" style="cursor:pointer; color: rebeccapurple"></span>
+                                <span class="oi oi-circle-x action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
                             }
                             else
                             {
-                                <span class="oi oi-circle-check" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)" style="cursor:pointer; color: rebeccapurple"></span>
+                                <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
                             }
-                            <span class="oi oi-pencil" @onclick="() => ContentRequestForm(contentRequest)" style="cursor:pointer; color: rebeccapurple; margin-left: 25px;"></span>
-                            <span class="oi oi-trash" @onclick="() => DeleteContentRequest(contentRequest)" style="cursor:pointer; color: rebeccapurple; margin-left: 25px;"></span>
+                            <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
+                            <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
                         </td>
                     </tr>
                 }
@@ -123,12 +123,13 @@ else
         </table>
     }
 }
-@*</div>*@
 
 @code {
     public bool contentRequestForm = false;
     private List<ContentRequest>? contentRequests;
     private ContentRequest contentRequestModel = null;
+    private string contentRequestFormTitle = "";
+    private string searchTableInput = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,10 +152,12 @@ else
     {
         if (contentRequest == null)
         {
+            contentRequestFormTitle = "New Content Request";
             contentRequestModel = new ContentRequest();
         }
         else
         {
+            contentRequestFormTitle = "Edit Content Request";
             contentRequestModel = contentRequest;
         }
         ShowHideContentRequestForm();
@@ -169,4 +172,38 @@ else
     {
         contentRequests = await contentService.ChangeContentRequestStatus(id);
     }
+
+    private void FilterTable(string filterByProperty)
+    {
+
+        switch (filterByProperty)
+        {
+            case "TYPE":
+                contentRequests = contentRequests.OrderByDescending(x => x.Type).ToList();
+                break;
+            case "TITLE":
+                contentRequests = contentRequests.OrderBy(x => x.Title).ToList();
+                break;
+            case "DATE":
+                contentRequests = contentRequests.OrderByDescending(x => x.CreatedDateTime).ToList();
+                break;
+            case "REQUESTEDBY":
+                contentRequests = contentRequests.OrderBy(x => x.UserName).ToList();
+                break;
+            case "COMPLETE":
+                contentRequests = contentRequests.OrderByDescending(x => x.IsComplete).ToList();
+                break;
+            case "YEAR":
+                contentRequests = contentRequests.OrderByDescending(x => x.Year).ToList();
+                break;
+            case "COMMENTS":
+                contentRequests = contentRequests.OrderByDescending(x => x.Comments).ToList();
+                break;
+            case "IMDBID":
+                contentRequests = contentRequests.OrderByDescending(x => x.ImdbId).ToList();
+                break;
+        }
+    }
+
+
 }

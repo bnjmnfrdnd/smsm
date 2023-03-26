@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using smsm.Data.Migrations;
 using smsm.Data.Models;
+using System.Globalization;
 
 namespace smsm.Data.Services
 {
@@ -7,6 +9,7 @@ namespace smsm.Data.Services
     {
         private ApplicationDbContext database;
         private LogService logService;
+        TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
         public ContentService(ApplicationDbContext database, LogService logService)
         {
@@ -23,6 +26,11 @@ namespace smsm.Data.Services
         {
             try
             {
+                if (contentRequest.Title != "" && contentRequest.Title != null)
+                {
+                    contentRequest.Title = textInfo.ToTitleCase(contentRequest.Title);
+                }
+
                 if (contentRequest.Id == 0)
                 {
                     contentRequest.CreatedDateTime = DateTime.Now;
@@ -86,7 +94,5 @@ namespace smsm.Data.Services
 
             return await GetContentRequestsAsync();
         }        
-        
-
     }
 }
