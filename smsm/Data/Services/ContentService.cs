@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore;
 using smsm.Data.Migrations;
 using smsm.Data.Models;
 using System.Globalization;
+using System.IO;
 
 namespace smsm.Data.Services
 {
@@ -15,6 +17,17 @@ namespace smsm.Data.Services
         {
             this.database = database;
             this.logService = logService;
+        }
+
+        public async Task<List<Content>> UploadFileAsync(InputFileChangeEventArgs document)
+        {
+                
+            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+        }
+
+        public async Task<List<Content>> GetContentAsync()
+        {
+            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
         }
 
         public async Task<List<ContentRequest>> GetContentRequestsAsync()
@@ -43,13 +56,13 @@ namespace smsm.Data.Services
                     contentRequest.UserId = 0;
 
                     database.Add(contentRequest);
-                    logService.CreateLog("New Content Request", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year}.");
+                    logService.CreateLog("Content Request Added", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
                 }
                 else
                 {
                     database.Update(contentRequest);
                     var existingContentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == contentRequest.Id);
-                    logService.CreateLog("Content Request Updated", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year}.");
+                    logService.CreateLog("Content Request Updated", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
                 }
 
                 await database.SaveChangesAsync();
@@ -63,6 +76,57 @@ namespace smsm.Data.Services
             }
         }
 
+        public async Task<List<Content>> SaveContent(Content content)
+        {
+            try
+            {
+                if (content.Title != "" && content.Title != null)
+                {
+                    content.Title = textInfo.ToTitleCase(content.Title);
+                }
+
+                if (content.Id == 0)
+                {
+                    content.CreatedDateTime = DateTime.Now;
+                    content.Archived = false;
+                    content.Type = content.Type == null ? "" : content.Type;
+                    content.Title = content.Title == null ? "" : content.Title;
+                    content.Year = content.Year == null ? "" : content.Year;
+                    content.ImdbId = content.ImdbId == null ? "" : content.ImdbId;
+
+                    database.Add(content);
+                    logService.CreateLog($"{content.Type} Added", $"{content.Title} ({content.Year}).");
+                }
+                else
+                {
+                    database.Update(content);
+                    var existingContent = database.Content.SingleOrDefault(x => x.Id == content.Id);
+                    logService.CreateLog($"{content.Type} Updated", $"{content.Title} ({content.Year}).");
+                }
+
+                await database.SaveChangesAsync();
+
+
+                return await GetContentAsync();
+            }
+            catch (Exception)
+            {
+                return await GetContentAsync();
+            }
+        }
+
+        public async Task<List<Content>> DeleteContent(Content content)
+        {
+            content.Archived = true;
+
+            database.Update(content);
+            await database.SaveChangesAsync();
+
+            logService.CreateLog($"{content.Type} Deleted", $"{content.Title} ({content.Year}) - {content.Type}.");
+
+            return await GetContentAsync();
+        }
+
         public async Task<List<ContentRequest>> ChangeContentRequestStatus(int id)
         {
             var contentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == id);
@@ -70,11 +134,11 @@ namespace smsm.Data.Services
 
             if (contentRequest.IsComplete)
             {
-                logService.CreateLog("Content Request Complete", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as completed.");
+                logService.CreateLog("Content Request Complete", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
             }
             else
             {
-                logService.CreateLog("Content Request Incomplete", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as incompleted.");
+                logService.CreateLog("Content Request Incomplete", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
             }
 
             database.Update(contentRequest);
@@ -90,7 +154,7 @@ namespace smsm.Data.Services
             database.Update(contentRequest);
             await database.SaveChangesAsync();
 
-            logService.CreateLog("Content Request Deleted", $"Request for {contentRequest.Type} titled '{contentRequest.Title}' from {contentRequest.Year} marked as deleted.");
+            logService.CreateLog("Content Request Deleted", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
 
             return await GetContentRequestsAsync();
         }        

@@ -1,0 +1,236 @@
+﻿@page "/Content"
+@using System
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
+@using smsm.Data.Models
+@using smsm.Data.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject ContentService contentService
+@inject IWebHostEnvironment Environment
+
+<PageTitle>Content</PageTitle>
+
+@if (contentForm)
+{
+    <form @onsubmit="SaveNewContent">
+        <div class="card-custom">
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="newContentTypeInput">Type</label>
+                        <select class="form-control" id="newContentTypeInput" @bind="contentModel.Type">
+                            <option value=""></option>
+                            <option value="Movie">Movie</option>
+                            <option value="TV Series">TV Series</option>
+                            <option value="Documentary">Documentary</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentTitleInput">Title</label>
+                        <input type="text" class="form-control" id="newContentTitleInput" @bind-value="contentModel.Title">
+                    </div>
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentYearInput">Year</label>
+                        <select class="form-control" id="newContentTypeInput" @bind="contentModel.Year">
+                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) {                                
+                                <option value="@i">@i</option>
+                            }                            
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentCommentsInput">Comments</label>
+                        <input type="text" class="form-control" id="newContentCommentsInput" @bind-value="contentModel.Comments">
+                    </div>
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <label for="newContentImdbIdInput">IMDB ID</label>
+                        <input type="text" class="form-control" id="newContentImdbIdInput" @bind-value="contentModel.ImdbId">
+                    </div>
+                </div><div class="row">
+                    <div class="form-group col-lg-6 col-sm-12 mt-3">
+                        <input type="submit" class="btn btn-primary" value="Submit" />
+                        <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideContentForm" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+else if (uploadForm)
+{
+    <div class="card-custom">
+        <div class="card-body-custom">
+            <div class="row">
+                <div class="form-group col-lg-6 col-sm-12">
+                    <label for="newContentUploadInput">Upload</label>
+                    <InputFile type="file" class="form-control" id="newContentUploadInput" OnChange="@UploadFile" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6 col-sm-12 mt-3">
+                    <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideUploadForm" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @if (contentList == null)
+    {
+        <p><em>Loading...</em></p>
+    }    
+    else
+    {
+        <button type="button" @onclick="() => ContentForm(null)" class="btn btn-primary mb-3">New</button>
+        <button type="button" @onclick="ShowHideUploadForm" class="btn btn-primary mb-3">Upload</button>
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Added</th>
+                    <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
+                    <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
+                    <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
+                    <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
+                    <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var content in contentList)
+                {
+                    <tr>
+                        <td>@content.CreatedDateTime.ToShortDateString()</td>
+                        <td>@content.Type</td>
+                        <td>@content.Title</td>
+                        <td>@content.Year</td>
+                        <td>@content.Comments</td>
+                        <td><a href="https://www.imdb.com/title/@content.ImdbId" target="_blank">@(content.ImdbId == null ? "" : content.ImdbId.ToUpper())</a></td>
+                        <td>                          
+                            <span class="oi oi-pencil action-buttons" @onclick="() => ContentForm(content)"></span>
+                            <span class="oi oi-trash action-buttons" @onclick="() => DeleteContent(content)"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    public bool contentForm = false;
+    public bool uploadForm = false;
+    private List<smsm.Data.Models.Content>? contentList;
+    private smsm.Data.Models.Content contentModel = null;
+    private string contentFormTitle = "";
+    private string searchTableInput = "";
+    string file = "";
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentList = await contentService.GetContentAsync();
+    }
+
+    private async Task SaveNewContent()
+    {
+        contentList = await contentService.SaveContent(contentModel);
+        contentModel = null; 
+        ShowHideContentForm();
+    }
+
+    private async Task DeleteContent(smsm.Data.Models.Content content)
+    {
+        contentList = await contentService.DeleteContent(content);
+    }
+
+    private void ContentForm(smsm.Data.Models.Content content)
+    {
+        if (content == null)
+        {
+            contentFormTitle = "New Content";
+            contentModel = new smsm.Data.Models.Content();
+        }
+        else
+        {
+            contentFormTitle = "Edit Content";
+            contentModel = content;
+        }
+        ShowHideContentForm();
+    }
+
+    private async void UploadFile(InputFileChangeEventArgs document)
+    {
+        isLoading = true;
+        loadedFiles.Clear();
+
+        //foreach (var file in document.GetMultipleFiles(maxAllowedFiles))
+        //{
+        //    try
+        //    {
+        //        loadedFiles.Add(file);
+
+        //        var trustedFileNameForFileStorage = Path.GetRandomFileName();
+        //        //var path = Path.Combine(Environment.ContentRootPath,
+        //        //        Environment.EnvironmentName, "unsafe_uploads",
+        //        //        trustedFileNameForFileStorage);
+
+        //        await using FileStream fs = new(System.IO.Directory.GetCurrentDirectory(), FileMode.Create);
+        //        await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+        //    }
+        //    catch (Exception ex)
+        //    {
+                
+        //    }
+        //}
+
+        isLoading = false;
+    }
+
+    private void ShowHideContentForm()
+    {
+        contentForm = !contentForm;
+    }
+
+    private void ShowHideUploadForm()
+    {
+        uploadForm = !uploadForm;
+    }
+
+    private void FilterTable(string filterByProperty)
+    {
+
+        switch (filterByProperty)
+        {
+            case "TYPE":
+                contentList = contentList.OrderByDescending(x => x.Type).ToList();
+                break;
+            case "TITLE":
+                contentList = contentList.OrderBy(x => x.Title).ToList();
+                break;
+            case "DATE":
+                contentList = contentList.OrderByDescending(x => x.CreatedDateTime).ToList();
+                break;
+            case "YEAR":
+                contentList = contentList.OrderByDescending(x => x.Year).ToList();
+                break;
+            case "COMMENTS":
+                contentList = contentList.OrderByDescending(x => x.Comments).ToList();
+                break;
+            case "IMDBID":
+                contentList = contentList.OrderByDescending(x => x.ImdbId).ToList();
+                break;
+        }
+    }
+
+
+}

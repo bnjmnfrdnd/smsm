@@ -132,7 +132,7 @@ input[type=text] {
 .action-buttons {
     cursor: pointer;
     color: rebeccapurple;
-    margin-left: 25px;
+    margin-right: 25px;
 }
 
 .action-buttons:hover {
