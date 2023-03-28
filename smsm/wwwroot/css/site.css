@@ -142,3 +142,12 @@ input[type=text] {
 .column-sorted {
     cursor: pointer;
 }
+
+.data-card {
+    background-color: #f1f1f1 !important;
+}
+
+    .data-card p {
+        margin-bottom: 0px !important;
+    }
+

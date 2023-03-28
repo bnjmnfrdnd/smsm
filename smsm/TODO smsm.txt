@@ -12,3 +12,7 @@ User management screen for admin
 Add admin priveledges to certain areas of the site i.e. logs
 
 Paginate tables
+
+When saving content request, add to content list
+
+After upload ing file, the page needs to sawitch back to the list

@@ -7,82 +7,68 @@ using System.Globalization;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace smsm.Data.Services
 {
     public class ContentService
     {
+        private readonly IWebHostEnvironment environment;
         private ApplicationDbContext database;
         private LogService logService;
         TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-        public ContentService(ApplicationDbContext database, LogService logService)
+        public ContentService(ApplicationDbContext database, LogService logService, IWebHostEnvironment environment)
         {
             this.database = database;
             this.logService = logService;
+            this.environment = environment;
         }
 
         public async Task<List<Content>> UploadFileAsync(string file)
         {
-            file = file.Trim();
-            file = file.Replace("\r\n", ",");
-            file = file.Replace(".png", ",");
-            file = file.Replace(".mkv", ",");
-            file = file.Replace(".mp4", ",");
-            file = file.Replace(".wav", ",");
-            file = file.Replace(".mp3", ",");
-            file = file.Replace(".m4a", ",");
-            
+            List<string> data = file.Split("\n").ToList();
+            List<string> contentList = new List<string>();
+            List<string> removables = new List<string>() { ".mkv", ".mp4", ".wmv", ".mov", ".avi", ".MKV", ".MP4", ".WMV", ".MOV", ".AVI", "\r" };
+            List<string> skipList = new List<string>() { "Name", "", "----" };
 
-            while (file.Contains(",,"))
+            foreach (string content in data)
             {
-                file = file.Replace(",,", ",");
-            }
-            while (file.Contains("  "))
-            {
-                file = file.Replace("  ", " ");
-            }
-            while (file.Contains(", ,"))
-            {
-                file = file.Replace(", ,", ",");
+                string newContent = content.Trim();
+                removables.ForEach(removable => newContent = newContent.Replace(removable, ""));
+                contentList.Add(newContent);
             }
 
-            List<string> contentList = file.Split(',').ToList();
-            List<string> duplicateContentList = new List<string>();
-
-            foreach(string str in contentList)
+            foreach (string content in contentList)
             {
-                switch (str)
+                if (!skipList.Any(x => x.ToUpper().Equals(content.ToUpper())))
                 {
-                    case " ":
-                        break;
-                    case "":
-                        break;
-                    case "Name ":
-                        break;
-                    case "---- ":
-                        break;
-                    default:
-                        duplicateContentList.Add(str);
-                        break;
+                    var year = Regex.Match(content, @"\(([^)]*)\)").Groups[1].Value;
+                    var title = Regex.Replace(content, @"\((.*?)\)", "").Trim();
+
+                    if (!Int32.TryParse(year, out var year_int)) 
+                    {
+                        year = "";
+                    }
+
+                    Content newContent = new Content()
+                    {
+                        Title = title.ToString(),
+                        Year = year.ToString(),
+                        CreatedDateTime = DateTime.Now,
+                        Type = year != String.Empty ? "Movie" : "TV Series",
+                        ImdbId = String.Empty,
+                        Comments = String.Empty,
+                        Description = String.Empty,
+                        Archived = false,
+                    };
+
+                    database.Add(newContent);
+
+                    logService.CreateLog($"{newContent.Type} Added (Upload)", $"{newContent.Title} ({newContent.Year})");
                 }
-            }
-
-            foreach (string str in duplicateContentList)
-            {
-
-                var year = Regex.Matches(str, @"\[(.*?)\]");
-                var title = Regex.Replace(str, "\\[([^\\s]*)\\]", "$1");
-
-                Content content = new Content()
-                {
-                    Title = title,
-                    Year = year.Count != 0 ? year[0].ToString() : "N/A",
-                    CreatedDateTime = DateTime.Now,
-                    Type = year.Count != 0 ? "Movie" : "Uploaded",
-                };
-
-                database.Add(content);
             }
             await database.SaveChangesAsync();
 
@@ -120,13 +106,13 @@ namespace smsm.Data.Services
                     contentRequest.UserId = 0;
 
                     database.Add(contentRequest);
-                    logService.CreateLog("Content Request Added", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
+                    logService.CreateLog($"{contentRequest.Type} Request Added", $"{contentRequest.Title} ({contentRequest.Year})");
                 }
                 else
                 {
                     database.Update(contentRequest);
                     var existingContentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == contentRequest.Id);
-                    logService.CreateLog("Content Request Updated", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
+                    logService.CreateLog($"{contentRequest.Type} Request Updated", $"{contentRequest.Title} ({contentRequest.Year})");
                 }
 
                 await database.SaveChangesAsync();
@@ -159,13 +145,13 @@ namespace smsm.Data.Services
                     content.ImdbId = content.ImdbId == null ? "" : content.ImdbId;
 
                     database.Add(content);
-                    logService.CreateLog($"{content.Type} Added", $"{content.Title} ({content.Year}).");
+                    logService.CreateLog($"{content.Type} Added", $"{content.Title} ({content.Year})");
                 }
                 else
                 {
                     database.Update(content);
                     var existingContent = database.Content.SingleOrDefault(x => x.Id == content.Id);
-                    logService.CreateLog($"{content.Type} Updated", $"{content.Title} ({content.Year}).");
+                    logService.CreateLog($"{content.Type} Updated", $"{content.Title} ({content.Year})");
                 }
 
                 await database.SaveChangesAsync();
@@ -186,7 +172,7 @@ namespace smsm.Data.Services
             database.Update(content);
             await database.SaveChangesAsync();
 
-            logService.CreateLog($"{content.Type} Deleted", $"{content.Title} ({content.Year}) - {content.Type}.");
+            logService.CreateLog($"{content.Type} Deleted", $"{content.Title} ({content.Year})");
 
             return await GetContentAsync();
         }
@@ -221,6 +207,6 @@ namespace smsm.Data.Services
             logService.CreateLog("Content Request Deleted", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
 
             return await GetContentRequestsAsync();
-        }        
+        }
     }
 }

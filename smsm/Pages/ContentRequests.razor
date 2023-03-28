@@ -67,6 +67,28 @@ else
     else
     {
         <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
+        @*<button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-danger mb-3">Remove Duplicates Requests</button>*@
+
+                <div class="card mb-3">
+            <div class="card-body data-card">
+                <div class="col-12 text-center">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <p><b>@contentRequests.Count</b> Requests</p>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <p><b>@contentRequests.Where(x => !x.IsComplete).ToList().Count</b> Incomplete Requests</p>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <p><b>@contentRequests.Where(x => x.IsComplete).ToList().Count</b> Completed Requests</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="table-responsive">
         <table class="table table-striped">
 
             <thead>
@@ -121,6 +143,7 @@ else
                 }
             </tbody>
         </table>
+        </div>
     }
 }
 
@@ -134,6 +157,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         contentRequests = await contentService.GetContentRequestsAsync();
+        contentRequests = contentRequests.Distinct().ToList();
     }
 
     private async Task SaveNewContentRequest()

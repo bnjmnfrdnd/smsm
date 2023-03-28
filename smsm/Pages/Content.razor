@@ -31,9 +31,10 @@
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentYearInput">Year</label>
                         <select class="form-control" id="newContentTypeInput" @bind="contentModel.Year">
-                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) {                                
+                            @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--)
+                            {
                                 <option value="@i">@i</option>
-                            }                            
+                            }
                         </select>
                     </div>
                 </div>
@@ -61,16 +62,75 @@ else if (uploadForm)
     <div class="card-custom">
         <div class="card-body-custom">
             <div class="row">
+                <div class="form-group col-lg-12 col-sm-12">
+                    <h3>How to generate a compatible list of your media:</h3>
+                    <br>
+                    <ol>
+                        <h5>If you are using Windows:</h5>
+                        <br>
+                        <ol>
+                            <li>
+                                Open PowerShell in your media directory (navigate to your directory and type <mark><b>powershell</b></mark> in the address bar).
+                            </li>
+                        </ol>
+                        <br>
+                        <h5>If you are using Ubuntu:</h5>
+                        <br>
+                        <ol>
+                            <li>
+                                Open the terminal and navigate to your media directory: <mark><b>cd [your media directory file path]</b></mark>.
+                            </li>
+                            <li>
+                                If you dont have PowerShell installed, download the latest PowerShell: <mark><b>sudo dpkg -i powershell-lts_7.3.3-1.deb_amd64.deb</b></mark>.
+                            </li>
+                            <li>
+                                Install the downloaded PowerShell package: <mark><b>sudo apt-get install -f</b></mark>.
+                            </li>
+                            <li>
+                                Type <mark><b>PowerShell</b></mark> in the terminal to start a PowerShell session.
+                            </li>
+                        </ol>
+                        <br>
+                        <li>
+                            In your PowerShell window, type the following: <mark><b>get-childitem -Recurse -include *.mkv, *.mp4, *.wmv, *.mov, *.avi | select name > smsm.txt</b></mark> and press enter.
+                        </li>
+                        <li>
+                            A file named <mark><b>smsm.txt</b></mark> will be in your current directory. This file contains a list of all of your media.
+                        </li>
+                        <li>
+                            Upload the <mark><b>smsm.txt</b></mark> file to the upload point below.
+                        </li>
+                        <li>
+                            Your content library will be updated.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-custom">
+        <div class="card-body-custom">
+            <div class="row">
                 <div class="form-group col-lg-6 col-sm-12">
-                    <label for="newContentUploadInput">Upload</label>
                     <InputFile type="file" class="form-control" id="newContentUploadInput" OnChange="@UploadFile" />
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-lg-6 col-sm-12 mt-3">
-                    <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideUploadForm" />
+                    @if (showUploading)
+                    {
+                        <button class="btn btn-primary" type="button" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="sr-only">Uploading...</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <input type="button" class="btn btn-primary" value="Close" @onclick="ShowHideUploadForm" />
+                    }
                 </div>
             </div>
+
         </div>
     </div>
 }
@@ -79,53 +139,80 @@ else
     @if (contentList == null)
     {
         <p><em>Loading...</em></p>
-    }    
+    }
     else
     {
-        <button type="button" @onclick="() => ContentForm(null)" class="btn btn-primary mb-3">New</button>
-        <button type="button" @onclick="ShowHideUploadForm" class="btn btn-primary mb-3">Upload</button>
-        <table class="table table-striped">
+        <button type="button" @onclick="() => ContentForm(null)" class="btn btn-primary mb-3">Add</button>
+        <button type="button" @onclick="ShowHideUploadForm" class="btn btn-secondary mb-3">Upload</button>
 
-            <thead>
-                <tr>
-                    <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Added</th>
-                    <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
-                    <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
-                    <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
-                    <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
-                    <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="card mb-3">
+            <div class="card-body data-card">
+                <div class="col-12 text-center">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-12">
+                            <p><b>@contentList.Count</b> Items</p>
+                        </div>
+                        <div class="col-lg-3 col-md-12 col-sm-12">
+                            <p><b>@contentList.Where(x => x.Type == "Movie").ToList().Count</b> Movies</p>
+                        </div>
+                        <div class="col-lg-3 col-md-12 col-sm-12">
+                            <p><b>@contentList.Where(x => x.Type == "TV Series").ToList().Count</b> TV Episodes</p>
+                        </div>
+                        <div class="col-lg-3 col-md-12 col-sm-12">
+                            <p><b>@contentList.Where(x => x.Type == "Documentary").ToList().Count</b> Documentaries</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                @foreach (var content in contentList)
-                {
+        <div class="table-responsive">
+            <table class="table table-striped">
+
+                <thead>
                     <tr>
-                        <td>@content.CreatedDateTime.ToShortDateString()</td>
-                        <td>@content.Type</td>
-                        <td>@content.Title</td>
-                        <td>@content.Year</td>
-                        <td>@content.Comments</td>
-                        <td><a href="https://www.imdb.com/title/@content.ImdbId" target="_blank">@(content.ImdbId == null ? "" : content.ImdbId.ToUpper())</a></td>
-                        <td>                          
-                            <span class="oi oi-pencil action-buttons" @onclick="() => ContentForm(content)"></span>
-                            <span class="oi oi-trash action-buttons" @onclick="() => DeleteContent(content)"></span>
-                        </td>
+                        <th></th>
+                        <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Added</th>
+                        <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
+                        <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
+                        <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
+                        <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
+                        <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+
+                    @foreach (var content in contentList)
+                    {
+                        <tr>
+                            <td>@(contentList.IndexOf(content) + 1)</td>
+                            <td>@content.CreatedDateTime.ToShortDateString()</td>
+                            <td>@content.Type</td>
+                            <td>@content.Title</td>
+                            <td>@content.Year</td>
+                            <td>@content.Comments</td>
+                            <td><a href="https://www.imdb.com/title/@content.ImdbId" target="_blank">@(content.ImdbId == null ? "" : content.ImdbId.ToUpper())</a></td>
+                            <td>
+                                <span class="oi oi-pencil action-buttons" @onclick="() => ContentForm(content)"></span>
+                                <span class="oi oi-trash action-buttons" @onclick="() => DeleteContent(content)"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 }
 
 @code {
-    public bool contentForm = false;
-    public bool uploadForm = false;
-    private List<smsm.Data.Models.Content>? contentList;
-    private smsm.Data.Models.Content contentModel = null;
     private string contentFormTitle = "";
     private string searchTableInput = "";
+    public bool contentForm = false;
+    public bool uploadForm = false;
+    public bool showUploading = false;
+    private List<smsm.Data.Models.Content>? contentList;
+    private smsm.Data.Models.Content contentModel = null;
 
 
     protected override async Task OnInitializedAsync()
@@ -136,7 +223,7 @@ else
     private async Task SaveNewContent()
     {
         contentList = await contentService.SaveContent(contentModel);
-        contentModel = null; 
+        contentModel = null;
         ShowHideContentForm();
     }
 
@@ -162,14 +249,13 @@ else
 
     private async void UploadFile(InputFileChangeEventArgs document)
     {
-            MemoryStream ms = new MemoryStream();
-            await document.File.OpenReadStream().CopyToAsync(ms);
-            var bytes = ms.ToArray();
-            // this neds to be sorted sometimes utf-8 sometimes default !
-            string file = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
-
-            contentList = await contentService.UploadFileAsync(file);
-
+        showUploading = true;
+        MemoryStream ms = new MemoryStream();
+        await document.File.OpenReadStream().CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        string file = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
+        contentList = await contentService.UploadFileAsync(file);
+        showUploading = false;
     }
 
     private void ShowHideContentForm()
@@ -207,6 +293,4 @@ else
                 break;
         }
     }
-
-
 }
