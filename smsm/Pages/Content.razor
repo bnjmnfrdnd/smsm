@@ -1,13 +1,9 @@
 ﻿@page "/Content"
-@using System
-@using System.IO
-@using Microsoft.AspNetCore.Hosting
-@using Microsoft.Extensions.Logging
+
 @using smsm.Data.Models
 @using smsm.Data.Services
 @using Microsoft.AspNetCore.Components.Forms
 @inject ContentService contentService
-@inject IWebHostEnvironment Environment
 
 <PageTitle>Content</PageTitle>
 
@@ -130,11 +126,7 @@ else
     private smsm.Data.Models.Content contentModel = null;
     private string contentFormTitle = "";
     private string searchTableInput = "";
-    string file = "";
-    private List<IBrowserFile> loadedFiles = new();
-    private long maxFileSize = 1024 * 15;
-    private int maxAllowedFiles = 3;
-    private bool isLoading;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -170,30 +162,14 @@ else
 
     private async void UploadFile(InputFileChangeEventArgs document)
     {
-        isLoading = true;
-        loadedFiles.Clear();
+            MemoryStream ms = new MemoryStream();
+            await document.File.OpenReadStream().CopyToAsync(ms);
+            var bytes = ms.ToArray();
+            // this neds to be sorted sometimes utf-8 sometimes default !
+            string file = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
 
-        //foreach (var file in document.GetMultipleFiles(maxAllowedFiles))
-        //{
-        //    try
-        //    {
-        //        loadedFiles.Add(file);
+            contentList = await contentService.UploadFileAsync(file);
 
-        //        var trustedFileNameForFileStorage = Path.GetRandomFileName();
-        //        //var path = Path.Combine(Environment.ContentRootPath,
-        //        //        Environment.EnvironmentName, "unsafe_uploads",
-        //        //        trustedFileNameForFileStorage);
-
-        //        await using FileStream fs = new(System.IO.Directory.GetCurrentDirectory(), FileMode.Create);
-        //        await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
-        //    }
-        //    catch (Exception ex)
-        //    {
-                
-        //    }
-        //}
-
-        isLoading = false;
     }
 
     private void ShowHideContentForm()

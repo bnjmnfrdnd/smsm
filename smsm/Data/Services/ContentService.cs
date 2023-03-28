@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.EntityFrameworkCore;
 using smsm.Data.Migrations;
 using smsm.Data.Models;
 using System.Globalization;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
 
 namespace smsm.Data.Services
 {
@@ -19,9 +22,70 @@ namespace smsm.Data.Services
             this.logService = logService;
         }
 
-        public async Task<List<Content>> UploadFileAsync(InputFileChangeEventArgs document)
+        public async Task<List<Content>> UploadFileAsync(string file)
         {
-                
+            file = file.Trim();
+            file = file.Replace("\r\n", ",");
+            file = file.Replace(".png", ",");
+            file = file.Replace(".mkv", ",");
+            file = file.Replace(".mp4", ",");
+            file = file.Replace(".wav", ",");
+            file = file.Replace(".mp3", ",");
+            file = file.Replace(".m4a", ",");
+            
+
+            while (file.Contains(",,"))
+            {
+                file = file.Replace(",,", ",");
+            }
+            while (file.Contains("  "))
+            {
+                file = file.Replace("  ", " ");
+            }
+            while (file.Contains(", ,"))
+            {
+                file = file.Replace(", ,", ",");
+            }
+
+            List<string> contentList = file.Split(',').ToList();
+            List<string> duplicateContentList = new List<string>();
+
+            foreach(string str in contentList)
+            {
+                switch (str)
+                {
+                    case " ":
+                        break;
+                    case "":
+                        break;
+                    case "Name ":
+                        break;
+                    case "---- ":
+                        break;
+                    default:
+                        duplicateContentList.Add(str);
+                        break;
+                }
+            }
+
+            foreach (string str in duplicateContentList)
+            {
+
+                var year = Regex.Matches(str, @"\[(.*?)\]");
+                var title = Regex.Replace(str, "\\[([^\\s]*)\\]", "$1");
+
+                Content content = new Content()
+                {
+                    Title = title,
+                    Year = year.Count != 0 ? year[0].ToString() : "N/A",
+                    CreatedDateTime = DateTime.Now,
+                    Type = year.Count != 0 ? "Movie" : "Uploaded",
+                };
+
+                database.Add(content);
+            }
+            await database.SaveChangesAsync();
+
             return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
         }
 
