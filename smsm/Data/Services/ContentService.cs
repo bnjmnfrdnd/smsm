@@ -50,8 +50,8 @@ namespace smsm.Data.Services
 
                     if (!Int32.TryParse(year, out var year_int)) 
                     {
-                        year = "";
-                    }
+                        year = "";                         
+                    } 
 
                     Content newContent = new Content()
                     {
@@ -130,6 +130,8 @@ namespace smsm.Data.Services
         {
             try
             {
+                List<Content> contentList = database.Content.Where(x => !x.Archived).ToList();
+
                 if (content.Title != "" && content.Title != null)
                 {
                     content.Title = textInfo.ToTitleCase(content.Title);
@@ -143,6 +145,18 @@ namespace smsm.Data.Services
                     content.Title = content.Title == null ? "" : content.Title;
                     content.Year = content.Year == null ? "" : content.Year;
                     content.ImdbId = content.ImdbId == null ? "" : content.ImdbId;
+
+                    foreach (Content c in contentList)
+                    {
+                        if (
+                            (c.Title.ToUpper().Trim() == content.Title.ToUpper().Trim() 
+                            && c.Type.ToUpper().Trim() == content.Type.ToUpper().Trim())
+                            &&c.ImdbId == content.ImdbId
+                            )
+                        {
+                            return await GetContentAsync();
+                        }
+                    }
 
                     database.Add(content);
                     logService.CreateLog($"{content.Type} Added", $"{content.Title} ({content.Year})");
@@ -179,12 +193,25 @@ namespace smsm.Data.Services
 
         public async Task<List<ContentRequest>> ChangeContentRequestStatus(int id)
         {
-            var contentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == id);
+            Content content = null;
+            ContentRequest contentRequest = database.ContentRequests.SingleOrDefault(x => x.Id == id);
+
+            if (contentRequest == null) {
+                return await GetContentRequestsAsync();
+            }
             contentRequest.IsComplete = !contentRequest.IsComplete;
 
             if (contentRequest.IsComplete)
             {
                 logService.CreateLog("Content Request Complete", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
+
+                content = new Content()
+                {
+                    Title = contentRequest.Title,
+                    Type = contentRequest.Type,
+                    Year = contentRequest.Year,
+                    ImdbId = contentRequest.ImdbId,
+                };
             }
             else
             {
@@ -193,6 +220,11 @@ namespace smsm.Data.Services
 
             database.Update(contentRequest);
             await database.SaveChangesAsync();
+
+            if (content != null)
+            {
+                await SaveContent(content);
+            }
 
             return await GetContentRequestsAsync();
         }    

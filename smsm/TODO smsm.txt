@@ -1,7 +1,7 @@
 TODO: smsm
 
 IMDB API search, backend/frontend
-Content Page find a way to import all media from plex server? possibly list all in csv through terminal (run script, upload script) then add through function
+
 
 Create home page: ideas ? Brief how-to use
 
@@ -15,4 +15,6 @@ Paginate tables
 
 When saving content request, add to content list
 
-After upload ing file, the page needs to sawitch back to the list
+After uploading file, the page needs to switch back to the list
+
+Remove duplicate requests
