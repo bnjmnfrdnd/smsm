@@ -50,13 +50,22 @@ namespace smsm.Data.Services
 
                     if (!Int32.TryParse(year, out var year_int)) 
                     {
-                        year = "";                         
+                        year = String.Empty;                        
                     } 
+                    else
+                    {
+                        if (Int32.Parse(year) < 1900)
+                        {
+                            year = String.Empty;
+                        }
+                    }
+
+                    // Add in imdb API content lookup here - would be nice
 
                     Content newContent = new Content()
                     {
                         Title = title.ToString(),
-                        Year = year.ToString(),
+                        Year = year,
                         CreatedDateTime = DateTime.Now,
                         Type = year != String.Empty ? "Movie" : "TV Series",
                         ImdbId = String.Empty,
@@ -77,12 +86,12 @@ namespace smsm.Data.Services
 
         public async Task<List<Content>> GetContentAsync()
         {
-            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).Take(50).ToListAsync();
         }
 
         public async Task<List<ContentRequest>> GetContentRequestsAsync()
-        {            
-            return await database.ContentRequests.Where(x => !x.Archived).OrderBy(x=> x.IsComplete).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+        {
+            return await database.ContentRequests.Where(x => !x.Archived).OrderBy(x=> x.IsComplete).ThenByDescending(x => x.CreatedDateTime).Take(50).ToListAsync();
         }
 
         public async Task<List<ContentRequest>> SaveContentRequest(ContentRequest contentRequest)
