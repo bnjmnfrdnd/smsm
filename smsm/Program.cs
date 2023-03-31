@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using smsm.Areas.Identity;
 using smsm.Data;
 using smsm.Data.Services;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,12 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddTransient<LogService>();
 builder.Services.AddTransient<ContentService>();
+builder.Services.AddBlazorise(options =>
+     {
+         options.Immediate = true;
+     })
+    .AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 
 using (var client = new ApplicationDbContext())
 {

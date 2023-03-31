@@ -1,11 +1,86 @@
 ﻿@page "/"
 
+@using smsm.Data.Services
+@inject ContentService contentService
+
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<Button Color="Color.Primary" Clicked="@(async () => await HandleRedraw())">Redraw</Button>
 
-Welcome to your new app.
+<div class="row">
+    <div class="card-custom col-lg-6 col-md-6 col-sm-12">
+        <div class="card-body-custom">
+            <Chart @ref="barChart" Type="ChartType.Bar" TItem="double" Clicked="@OnClicked" />
+        </div>
+    </div>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+
+
+@code {
+    Chart<double> barChart;
+
+    private List<smsm.Data.Models.Content>? contentList;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        contentList = await contentService.GetContentAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await HandleRedraw();
+        }
+    }
+
+    async Task HandleRedraw()
+    {
+        await barChart.Clear();
+
+        await barChart.AddLabelsDatasetsAndUpdate(Labels, GetBarChartDataset());
+    }
+
+    private BarChartDataset<double> GetBarChartDataset()
+    {
+        return new()
+            {
+                Label = "#",
+                Data = RandomizeData(),
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                BorderWidth = 1
+            };
+    }
+
+    string[] Labels = { "Movies", "TV Series", "Documentaries" };
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    List<double> RandomizeData()
+    {
+        var r = new Random(DateTime.Now.Millisecond);
+
+
+
+
+        return new List<double> {
+            contentList.Where(x => x.Type == "Movie").ToList().Count,
+            contentList.Where(x => x.Type == "TV Series").ToList().Count,
+            contentList.Where(x => x.Type == "Documentary").ToList().Count,
+        };
+    }
+
+    Task OnClicked(ChartMouseEventArgs e)
+    {
+        var model = e.Model as BarChartModel;
+
+        Console.WriteLine($"Handling event for {nameof(BarChartModel)}: x:{model.X} y:{model.Y}");
+        return Task.CompletedTask;
+    }
+}
 
 

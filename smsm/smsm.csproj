@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazorise.Bootstrap" Version="1.2.2" />
+    <PackageReference Include="Blazorise.Charts" Version="1.2.2" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.3" />
