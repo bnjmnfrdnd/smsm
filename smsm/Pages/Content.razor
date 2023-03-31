@@ -166,6 +166,8 @@ else
             </div>
         </div>
 
+        <input class="form-control" @bind="searchQuery" @bind:event="oninput" @onkeyup="SearchTable"></input>
+
         <div class="table-responsive">
             <table class="table table-striped">
 
@@ -211,13 +213,27 @@ else
     public bool contentForm = false;
     public bool uploadForm = false;
     public bool showUploading = false;
+    public string searchQuery { get; set; } = "";
     private List<smsm.Data.Models.Content>? contentList;
+    private List<smsm.Data.Models.Content>? searchContentList;
     private smsm.Data.Models.Content contentModel = null;
 
+    public void SearchTable()
+    {
+        if (searchQuery == "" || searchQuery == null)
+        {
+            contentList = searchContentList;
+        }
+        else
+        {
+            contentList = searchContentList.Where(x => x.Title.ToUpper().Contains(searchQuery.ToUpper()) || x.ImdbId.ToUpper().Contains(searchQuery.ToUpper())).ToList();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         contentList = await contentService.GetContentAsync();
+        searchContentList = contentList;
     }
 
     private async Task SaveNewContent()
