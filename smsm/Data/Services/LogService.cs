@@ -19,7 +19,7 @@ namespace smsm.Data.Services
 
         public async Task<List<Log>> GetLogsAsync()
         {           
-            return await database.Logs.OrderByDescending(x => x.CreatedDateTime).ToListAsync();
+            return await database.Logs.OrderByDescending(x => x.CreatedDateTime).Take(50).ToListAsync();
         }
 
         public void CreateLog(string type, string description)

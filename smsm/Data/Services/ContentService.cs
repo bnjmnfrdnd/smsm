@@ -86,7 +86,7 @@ namespace smsm.Data.Services
 
         public async Task<List<Content>> GetContentAsync()
         {
-            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).ToListAsync();
+            return await database.Content.Where(x => !x.Archived).OrderBy(x => x.Title).ThenByDescending(x => x.CreatedDateTime).Take(25).ToListAsync();
         }
 
         public async Task<List<ContentRequest>> GetContentRequestsAsync()

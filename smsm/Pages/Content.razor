@@ -10,8 +10,9 @@
 @if (contentForm)
 {
     <form @onsubmit="SaveNewContent">
-        <div class="card-custom">
+        <div class="card-custom p-5">
             <div class="card-body-custom">
+                <h3 class="mb-5">@contentFormTitle</h3>
                 <div class="row">
                     <div class="form-group col-12">
                         <label for="newContentTypeInput">Type</label>
@@ -59,78 +60,75 @@
 }
 else if (uploadForm)
 {
-    <div class="card-custom">
-        <div class="card-body-custom">
-            <div class="row">
-                <div class="form-group col-lg-12 col-sm-12">
-                    <h3>How to generate a compatible list of your media:</h3>
-                    <br>
-                    <ol>
-                        <h5>If you are using Windows:</h5>
+    <div class="row-fluid justify-content-evenly">
+        <div class="card-custom p-5" >
+            <div class="card-body-custom">
+                <div class="row">
+                    <div class="form-group col-lg-12 col-sm-12">
+                        <h3>How to generate a compatible list of your media:</h3>
                         <br>
                         <ol>
+                            <h5>If you are using Windows:</h5>
+                            <br>
+                            <ol>
+                                <li>
+                                    Open PowerShell in your media directory (navigate to your directory and type <mark><b>powershell</b></mark> in the address bar).
+                                </li>
+                            </ol>
+                            <br>
+                            <h5>If you are using Ubuntu:</h5>
+                            <br>
+                            <ol>
+                                <li>
+                                    Open the terminal and navigate to your media directory: <mark><b>cd [your media directory file path]</b></mark>.
+                                </li>
+                                <li>
+                                    If you dont have PowerShell installed, download the latest PowerShell: <mark><b>sudo dpkg -i powershell-lts_7.3.3-1.deb_amd64.deb</b></mark>.
+                                </li>
+                                <li>
+                                    Install the downloaded PowerShell package: <mark><b>sudo apt-get install -f</b></mark>.
+                                </li>
+                                <li>
+                                    Type <mark><b>PowerShell</b></mark> in the terminal to start a PowerShell session.
+                                </li>
+                            </ol>
+                            <br>
                             <li>
-                                Open PowerShell in your media directory (navigate to your directory and type <mark><b>powershell</b></mark> in the address bar).
+                                In your PowerShell window, type the following: <mark><b>get-childitem -Recurse -include *.mkv, *.mp4, *.wmv, *.mov, *.avi | select name > smsm.txt</b></mark> and press enter.
+                            </li>
+                            <li>
+                                A file named <mark><b>smsm.txt</b></mark> will be in your current directory. This file contains a list of all of your media.
+                            </li>
+                            <li>
+                                Upload the <mark><b>smsm.txt</b></mark> file to the upload point below.
+                            </li>
+                            <li>
+                                Your content library will be updated.
                             </li>
                         </ol>
-                        <br>
-                        <h5>If you are using Ubuntu:</h5>
-                        <br>
-                        <ol>
-                            <li>
-                                Open the terminal and navigate to your media directory: <mark><b>cd [your media directory file path]</b></mark>.
-                            </li>
-                            <li>
-                                If you dont have PowerShell installed, download the latest PowerShell: <mark><b>sudo dpkg -i powershell-lts_7.3.3-1.deb_amd64.deb</b></mark>.
-                            </li>
-                            <li>
-                                Install the downloaded PowerShell package: <mark><b>sudo apt-get install -f</b></mark>.
-                            </li>
-                            <li>
-                                Type <mark><b>PowerShell</b></mark> in the terminal to start a PowerShell session.
-                            </li>
-                        </ol>
-                        <br>
-                        <li>
-                            In your PowerShell window, type the following: <mark><b>get-childitem -Recurse -include *.mkv, *.mp4, *.wmv, *.mov, *.avi | select name > smsm.txt</b></mark> and press enter.
-                        </li>
-                        <li>
-                            A file named <mark><b>smsm.txt</b></mark> will be in your current directory. This file contains a list of all of your media.
-                        </li>
-                        <li>
-                            Upload the <mark><b>smsm.txt</b></mark> file to the upload point below.
-                        </li>
-                        <li>
-                            Your content library will be updated.
-                        </li>
-                    </ol>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12">
+                        <InputFile type="file" class="form-control" id="newContentUploadInput" OnChange="@UploadFile" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-6 col-sm-12 mt-3">
+                        @if (showUploading)
+                        {
+                            <button class="btn btn-primary" type="button" disabled>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span class="sr-only">Uploading...</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <input type="button" class="btn btn-primary" value="Close" @onclick="ShowHideUploadForm" />
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="card-custom">
-        <div class="card-body-custom">
-            <div class="row">
-                <div class="form-group col-lg-6 col-sm-12">
-                    <InputFile type="file" class="form-control" id="newContentUploadInput" OnChange="@UploadFile" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-lg-6 col-sm-12 mt-3">
-                    @if (showUploading)
-                    {
-                        <button class="btn btn-primary" type="button" disabled>
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            <span class="sr-only">Uploading...</span>
-                        </button>
-                    }
-                    else
-                    {
-                        <input type="button" class="btn btn-primary" value="Close" @onclick="ShowHideUploadForm" />
-                    }
-                </div>
-            </div>
-
         </div>
     </div>
 }

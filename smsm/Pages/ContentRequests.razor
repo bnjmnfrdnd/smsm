@@ -9,11 +9,11 @@
 
 @if (contentRequestForm)
 {
-    <h3>@contentRequestFormTitle</h3>
 
     <form @onsubmit="SaveNewContentRequest">
-        <div class="card-custom">
+        <div class="card-custom p-5">
             <div class="card-body-custom">
+                <h3 class="mb-5">@contentRequestFormTitle</h3>
                 <div class="row">
                     <div class="form-group col-12">
                         <label for="newContentRequestTypeInput">Type</label>
@@ -46,7 +46,7 @@
                     </div>
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestImdbIdInput">IMDB ID</label>
-                        <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequestModel.ImdbId">
+                        <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequestModel.ImdbId" style="text-transform:uppercase !important;">
                     </div>
                 </div><div class="row">
                     <div class="form-group col-lg-6 col-sm-12 mt-3">
@@ -66,8 +66,7 @@ else
     }
     else
     {
-        <b type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</b utton>
-        @*<button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-danger mb-3">Remove Duplicates Requests</button>*@
+        <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
 
                 <div class="card mb-3">
             <div class="card-body data-card">
