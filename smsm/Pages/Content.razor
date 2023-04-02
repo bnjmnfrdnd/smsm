@@ -61,7 +61,7 @@
 else if (uploadForm)
 {
     <div class="row-fluid justify-content-evenly">
-        <div class="card-custom p-5" >
+        <div class="card-custom p-5">
             <div class="card-body-custom">
                 <div class="row">
                     <div class="form-group col-lg-12 col-sm-12">
@@ -140,8 +140,10 @@ else
     }
     else
     {
-        <button type="button" @onclick="() => ContentForm(null)" class="btn btn-primary mb-3">Add</button>
-        <button type="button" @onclick="ShowHideUploadForm" class="btn btn-secondary mb-3">Upload</button>
+        <AuthorizeView>
+            <button type="button" @onclick="() => ContentForm(null)" class="btn btn-primary mb-3">Add</button>
+            <button type="button" @onclick="ShowHideUploadForm" class="btn btn-secondary mb-3">Upload</button>
+        </AuthorizeView>
 
         <div class="card mb-3">
             <div class="card-body data-card">
