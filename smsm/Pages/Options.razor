@@ -1,0 +1,64 @@
+﻿@page "/Settings"
+@using smsm.Data.Models
+@using smsm.Data.Services
+@inject OptionService optionService
+
+<PageTitle>Settings</PageTitle>
+
+
+@if (options == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card-custom col-lg-6 col-md-12 col-sm-12 mb-5 p-5">
+                <div class="card-body-custom">
+                    <div class="row">
+                        <div class="form-group col-12 mt-3">
+                            <label>IMDb API Key:</label>
+                            <div class="input-group mb-3">
+                                <InputText @bind-Value="imdbApiKey" class="form-control"></InputText>
+                                <div class="input-group-append">
+                                    <input type="button" @onclick='() => SaveOption("IMDB_API_KEY", imdbApiKey)' Class="btn btn-primary" value="Save">
+                                </div>
+                            </div>
+                            <p><span class="oi oi-info"></span> Free tier IMDb accounts only allow up to <b>100</b> API calls per day.</p>
+
+
+                        </div>
+                    </div>
+
+
+                    @*<div class="row">
+                        <div class="form-group col-12 mt-3">
+                            <input type="button" @onclick='() => SaveOption("IMDB_API_KEY", imdbApiKey)' Class="btn btn-primary" value="Save">
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Option>? options;
+    private string imdbApiKey = String.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        options = await optionService.GetOptionsAsync();
+
+        if (options != null && options.Count != 0)
+        {
+            imdbApiKey = options.SingleOrDefault(x => x.Type == "IMDB_API_KEY").Value;
+        }
+    }
+
+    async private void SaveOption(string type, string value)
+    {
+        options = await optionService.SaveOptionAsync(type, value);
+    }
+}

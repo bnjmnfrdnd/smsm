@@ -112,8 +112,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        contentList = await contentService.GetContentAsync();
-        contentRequestList = await contentService.GetContentRequestsAsync();
+        contentList = await contentService.GetContentDashboardAsync();
+        contentRequestList = await contentService.GetContentRequestsDashboardAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

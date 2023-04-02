@@ -27,5 +27,7 @@ namespace smsm.Data
         public virtual DbSet<Content> Content { get; set; }
 
         public virtual DbSet<ContentRequest> ContentRequests { get; set; }
+
+        public virtual DbSet<Option> Options { get; set; }
     }
 }

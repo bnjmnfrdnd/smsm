@@ -33,9 +33,10 @@
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestYearInput">Year</label>
                         <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequestModel.Year">
-                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) {                                
+                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) 
+                            {
                                 <option value="@i">@i</option>
-                            }                            
+                            }
                         </select>
                     </div>
                 </div>
@@ -48,11 +49,23 @@
                         <label for="newContentRequestImdbIdInput">IMDB ID</label>
                         <input type="text" class="form-control" id="newContentRequestImdbIdInput" @bind-value="contentRequestModel.ImdbId" style="text-transform:uppercase !important;">
                     </div>
-                </div><div class="row">
+                </div>
+                <div class="row">
                     <div class="form-group col-lg-6 col-sm-12 mt-3">
-                        <input type="submit" class="btn btn-primary" value="Submit" />
-                        <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
-                    </div>
+
+                        @if (savingRequest)
+                        {
+                            <button class="btn btn-primary" type="button" disabled>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span class="sr-only">Saving...</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <input type="submit" class="btn btn-primary" value="Submit" />
+                            <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
+                        }
+</div>
                 </div>
             </div>
         </div>
@@ -85,7 +98,6 @@ else
                 </div>
             </div>
         </div>
-
 
         <div class="table-responsive">
         <table class="table table-striped">
@@ -152,6 +164,7 @@ else
     private ContentRequest contentRequestModel = null;
     private string contentRequestFormTitle = "";
     private string searchTableInput = "";
+    private bool savingRequest = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,8 +174,10 @@ else
 
     private async Task SaveNewContentRequest()
     {
+        savingRequest = true;
         contentRequests = await contentService.SaveContentRequest(contentRequestModel);
-        contentRequestModel = null; 
+        contentRequestModel = null;
+        savingRequest = false;
         ShowHideContentRequestForm();
     }
 

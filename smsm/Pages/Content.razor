@@ -45,7 +45,7 @@
                         <input type="text" class="form-control" id="newContentCommentsInput" @bind-value="contentModel.Comments">
                     </div>
                     <div class="form-group col-lg-6 col-sm-12">
-                        <label for="newContentImdbIdInput">IMDB ID</label>
+                        <label for="newContentImdbIdInput">IMDb ID</label>
                         <input type="text" class="form-control" id="newContentImdbIdInput" @bind-value="contentModel.ImdbId">
                     </div>
                 </div><div class="row">
@@ -270,6 +270,7 @@ else
         string file = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
         contentList = await contentService.UploadFileAsync(file);
         showUploading = false;
+        ShowHideUploadForm();
     }
 
     private void ShowHideContentForm()
