@@ -7,31 +7,31 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-2">
 
 
-    <div class="row mt-5" style="text-align:center">
+    <div class="row mt-2" style="text-align:center">
         <h3>Simple Media Server Manager (SMSM)</h3>
     </div>
-    <div class="row justify-content-evenly mt-5">
-        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
+    <div class="row justify-content-evenly mt-2">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-2">
             <div class="card-body-custom">
                 <BarChart @ref="contentBarChart" Type="ChartType.Bar" TItem="double" />
             </div>
         </div>
-        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-2">
             <div class="card-body-custom">
                 <PieChart @ref="contentRequestPieChart" Type="ChartType.Bar" TItem="double" />
             </div>
         </div>
     </div>
     <div class="row justify-content-evenly">
-        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-2">
             <div class="card-body-custom">
                 <LineChart @ref="contentRequestLineChart" Type="ChartType.Bar" TItem="double" />
             </div>
         </div>
-        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-2">
             <div class="card-body-custom">
                 <DoughnutChart @ref="contentRequestDoughnutChart" Type="ChartType.Bar" TItem="double" />
             </div>

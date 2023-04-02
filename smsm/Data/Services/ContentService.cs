@@ -27,7 +27,7 @@ namespace smsm.Data.Services
             List<string> contentList = new List<string>();
             List<string> removables = new List<string>() { ".mkv", ".mp4", ".wmv", ".mov", ".avi", ".MKV", ".MP4", ".WMV", ".MOV", ".AVI", "\r" };
             List<string> skipList = new List<string>() { "Name", "", "----" };
-            string apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY").Value;
+            string apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY")?.Value;
 
             foreach (string content in data)
             {
@@ -120,7 +120,7 @@ namespace smsm.Data.Services
         {
             try
             {
-                string apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY").Value;
+                string apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY")?.Value;
                 if (contentRequest.Title == "" && contentRequest.Title == null)
                 {
                     return await GetContentRequestsAsync();
