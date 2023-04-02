@@ -20,7 +20,7 @@ namespace smsm.Data.Services
             this.userManager = userManager;
             this.logService = logService;
             var currentUserId = this.userManager.GetUserIdAsync;
-            apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY").Value;
+            apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY")?.Value;
         }
 
         static async Task SetupHttpClient()
