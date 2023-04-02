@@ -5,14 +5,14 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="container">
-    <div class="row">
-        <div class="col-12">
+<div class="container-fluid mt-5">
+        <div class="row mt-5" style="text-align:center">
+        <h3>Login to your account</h3>
+    </div>
+    <div class="row justify-content-evenly mt-5">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5 p-5">
             <section>
                 <form id="account" method="post">
-                    <h2>Use a local account to log in.</h2>
-                    <hr />
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                     <div class="form-floating mb-3">
                         <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
@@ -31,7 +31,7 @@
                         </label>
                     </div>
                     <div>
-                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mb-3">Log in</button>
                     </div>
                     <div>
                         <p>
@@ -40,9 +40,9 @@
                         <p>
                             <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
                         </p>
-                        <p>
+                        @*<p>
                             <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                        </p>
+                        </p>*@
                     </div>
                 </form>
             </section>

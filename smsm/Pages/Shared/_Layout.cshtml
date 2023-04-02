@@ -11,7 +11,7 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/Identity/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/Identity/css/site.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
@@ -25,7 +25,8 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" href="~/">smsm</a>
+                <a href="" class="mr-1"><img src="~/images/logo.png" alt="logo" width="25" height="25"></a>
+                <p class="col-8" style="margin: 0px; color: black">SMSM</p>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -55,7 +56,7 @@
             @RenderBody()
         </main>
     </div>
-    <footer class="footer border-top pl-3 text-muted">
+@*    <footer class="footer border-top pl-3 text-muted">
         <div class="container">
         &copy; 2023 - smsm
             @{
@@ -66,7 +67,7 @@
                 <a asp-area="" asp-page="/Privacy">Privacy</a>
             }
         </div>
-    </footer>
+    </footer>*@
 
     <environment include="Development">
         <script src="~/Identity/lib/jquery/dist/jquery.js"></script>
