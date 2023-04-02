@@ -1,10 +1,5 @@
 TODO: smsm
 
-IMDB API search, backend/frontend
-
-
-Create home page: ideas ? Brief how-to use
-
 Sort logging in/out, first user created is admin byu default,
 
 User management screen for admin 
@@ -12,8 +7,6 @@ User management screen for admin
 Add admin priveledges to certain areas of the site i.e. logs
 
 Paginate tables
-
-When saving content request, add to content list
 
 After uploading file, the page needs to switch back to the list
 

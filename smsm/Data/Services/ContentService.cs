@@ -251,7 +251,7 @@ namespace smsm.Data.Services
 
             if (contentRequest.IsComplete)
             {
-                logService.CreateLog("Content Request Complete", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
+                logService.CreateLog("Content Request Complete", $"{contentRequest.Title} ({contentRequest.Year})");
 
                 content = new Content()
                 {
@@ -263,7 +263,7 @@ namespace smsm.Data.Services
             }
             else
             {
-                logService.CreateLog("Content Request Incomplete", $"{contentRequest.Title} {contentRequest.Year} - {contentRequest.Type}");
+                logService.CreateLog("Content Request Incomplete", $"{contentRequest.Title} ({contentRequest.Year}) ");
             }
 
             database.Update(contentRequest);

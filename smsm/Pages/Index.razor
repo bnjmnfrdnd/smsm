@@ -12,8 +12,7 @@
 
     <div class="row mt-5" style="text-align:center">
         <h3>Simple Media Server Manager (SMSM)</h3>
-        </div>
-
+    </div>
     <div class="row justify-content-evenly mt-5">
         <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
             <div class="card-body-custom">
@@ -26,7 +25,6 @@
             </div>
         </div>
     </div>
-
     <div class="row justify-content-evenly">
         <div class="card-custom col-lg-5 col-md-12 col-sm-12 mb-5">
             <div class="card-body-custom">
@@ -47,46 +45,47 @@
     List<string> contentRequestDateLabels = new List<string>();
     private List<smsm.Data.Models.ContentRequest>? contentRequestList;
     private List<smsm.Data.Models.Content>? contentList;
+
     BarChart<double> contentBarChart;
     PieChart<double> contentRequestPieChart;
     LineChart<double> contentRequestLineChart;
     DoughnutChart<double> contentRequestDoughnutChart;
 
     List<string> chartBackgroundColors = new List<string>
-    { 
-        ChartColor.FromRgba(97,0,109, 0.5f),
-        ChartColor.FromRgba(192,0,255, 0.5f),
-        ChartColor.FromRgba(109,0,171, 0.5f),
+    {
+    ChartColor.FromRgba(97,0,109, 0.5f),
+    ChartColor.FromRgba(192,0,255, 0.5f),
+    ChartColor.FromRgba(109,0,171, 0.5f),
     };
     List<string> chartBorderColors = new List<string>
-    { 
-        ChartColor.FromRgba(0,0,0, 1f),
+    {
+    ChartColor.FromRgba(0,0,0, 1f),
     };
 
     List<double> ContentDataSet()
     {
         return new List<double> {
-            contentList.Where(x => x.Type == "Movie").ToList().Count,
-            contentList.Where(x => x.Type == "TV Series").ToList().Count,
-            contentList.Where(x => x.Type == "Documentary").ToList().Count
-        };
+    contentList.Where(x => x.Type == "Movie").ToList().Count,
+    contentList.Where(x => x.Type == "TV Series").ToList().Count,
+    contentList.Where(x => x.Type == "Documentary").ToList().Count
+    };
     }
 
     List<double> ContentRequestDataSet()
     {
         return new List<double> {
-            contentRequestList.Where(x => x.IsComplete).ToList().Count,
-            contentRequestList.Where(x => !x.IsComplete).ToList().Count
-        };
-    } 
-    
+    contentRequestList.Where(x => x.IsComplete).ToList().Count,
+    contentRequestList.Where(x => !x.IsComplete).ToList().Count
+    };
+    }
+
     List<double> ContentRequestTypeDataSet()
     {
         return new List<double> {
-            contentRequestList.Where(x => x.Type == "Movie").ToList().Count,
-            contentRequestList.Where(x => x.Type == "TV Series").ToList().Count,
-            contentRequestList.Where(x => x.Type == "Documentary").ToList().Count
-        };
+    contentRequestList.Where(x => x.Type == "Movie").ToList().Count,
+    contentRequestList.Where(x => x.Type == "TV Series").ToList().Count,
+    contentRequestList.Where(x => x.Type == "Documentary").ToList().Count
+    };
     }
 
     List<double> ContentRequestTimeLineDataSet()
@@ -104,7 +103,7 @@
             var t = contentRequestList.Where(x => x.CreatedDateTime.Date == dateAdjusted).ToList();
 
             contentTimeLine.Add(
-                contentRequestList.Where(x => x.CreatedDateTime.Date == dateAdjusted).ToList().Count
+            contentRequestList.Where(x => x.CreatedDateTime.Date == dateAdjusted).ToList().Count
             );
         }
         return contentTimeLine;
@@ -153,7 +152,7 @@
                 BorderColor = chartBorderColors,
                 BorderWidth = 3
             };
-    }    
+    }
 
     LineChartDataset<double> GetContentRequestTimeLineChartDataset()
     {
@@ -166,6 +165,7 @@
                 Fill = true,
                 PointRadius = 3,
                 CubicInterpolationMode = "monotone",
+                
             };
     }
 
@@ -180,5 +180,4 @@
             };
     }
 }
-
 
