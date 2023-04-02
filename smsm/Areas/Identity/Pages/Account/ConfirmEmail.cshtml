@@ -1,8 +1,17 @@
 ﻿@page
 @model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "Email Confirmed";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="container-fluid mt-5">
+    <div class="row mt-5" style="text-align:center">
+        <h3>Your email has been confirmed</h3>
+    </div>
+    <div class="row justify-content-evenly mt-5">
+        <div class="card-custom col-lg-5 col-md-12 col-sm-12 p-5" style="text-align:center">
+            <a id="login-cancel" type="button" class="w-100 btn btn-lg btn-primary" href="/Identity/Account/Login">Click here to login</a>
+        </div>
+    </div>
+</div>
