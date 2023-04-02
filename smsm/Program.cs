@@ -27,6 +27,7 @@ builder.Services.AddTransient<LogService>();
 builder.Services.AddTransient<ContentService>();
 builder.Services.AddTransient<OptionService>();
 builder.Services.AddTransient<IMDbService>();
+builder.Services.AddTransient<UserService>();
 builder.Services.AddBlazorise(options =>
      {
          options.Immediate = true;

@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using smsm.Data.Models;
@@ -29,5 +30,7 @@ namespace smsm.Data
         public virtual DbSet<ContentRequest> ContentRequests { get; set; }
 
         public virtual DbSet<Option> Options { get; set; }
+
+        public virtual DbSet<IdentityUser> Users { get; set; }
     }
 }
