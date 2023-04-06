@@ -33,7 +33,7 @@
                     <div class="form-group col-lg-6 col-sm-12">
                         <label for="newContentRequestYearInput">Year</label>
                         <select class="form-control" id="newContentRequestTypeInput" @bind="contentRequestModel.Year">
-                            @for(int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--) 
+                            @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 100; i--)
                             {
                                 <option value="@i">@i</option>
                             }
@@ -65,7 +65,7 @@
                             <input type="submit" class="btn btn-primary" value="Submit" />
                             <input type="button" class="btn btn-secondary" value="Cancel" @onclick="ShowHideContentRequestForm" />
                         }
-</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,10 +79,11 @@ else
     }
     else
     {
+
         <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
 
-                <div class="card mb-3">
-            <div class="card-body data-card">
+        <div class="card-custom mb-3 p-3">
+            <div class="data-card">
                 <div class="col-12 text-center">
                     <div class="row">
                         <div class="col-lg-4 col-md-12 col-sm-12">
@@ -98,62 +99,63 @@ else
                 </div>
             </div>
         </div>
+        <div class="card-custom mb-3 p-3">
+            <div class="table-responsive">
+                <table class="table table-striped">
 
-        <div class="table-responsive">
-        <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Date</th>
+                            <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
+                            <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
+                            <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
+                            <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
+                            <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
+                            <th @onclick='() => FilterTable("REQUESTEDBY")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Requested by</th>
+                            <th @onclick='() => FilterTable("COMPLETE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Complete</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-            <thead>
-                <tr>
-                    <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Date</th>
-                    <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
-                    <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
-                    <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
-                    <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
-                    <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
-                    <th @onclick='() => FilterTable("REQUESTEDBY")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Requested by</th>
-                    <th @onclick='() => FilterTable("COMPLETE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Complete</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
+                        @foreach (var contentRequest in contentRequests)
+                        {
+                            <tr>
+                                <td>@contentRequest.CreatedDateTime.ToShortDateString()</td>
+                                <td>@contentRequest.Type</td>
+                                <td>@contentRequest.Title</td>
+                                <td>@contentRequest.Year</td>
+                                <td>@contentRequest.Comments</td>
+                                <td><a href="https://www.imdb.com/title/@contentRequest.ImdbId" target="_blank">@(contentRequest.ImdbId == null ? "" : contentRequest.ImdbId.ToUpper())</a></td>
+                                <td>@contentRequest.UserName</td>
+                                <td>
+                                    @if (@contentRequest.IsComplete)
+                                    {
+                                        <span class="oi oi-circle-check" style="color:green"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="oi oi-circle-x" style="color: red"></span>
+                                    }
+                                </td>
 
-                @foreach (var contentRequest in contentRequests)
-                {
-                    <tr>
-                        <td>@contentRequest.CreatedDateTime.ToShortDateString()</td>
-                        <td>@contentRequest.Type</td>
-                        <td>@contentRequest.Title</td>
-                        <td>@contentRequest.Year</td>
-                        <td>@contentRequest.Comments</td>
-                        <td><a href="https://www.imdb.com/title/@contentRequest.ImdbId" target="_blank">@(contentRequest.ImdbId == null ? "" : contentRequest.ImdbId.ToUpper())</a></td>
-                        <td>@contentRequest.UserName</td>
-                        <td>
-                            @if (@contentRequest.IsComplete)
-                            {
-                                <span class="oi oi-circle-check" style="color:green"></span>
-                            }
-                            else
-                            {
-                                <span class="oi oi-circle-x" style="color: red"></span>
-                            }
-                        </td>
-
-                        <td>
-                            @if (@contentRequest.IsComplete)
-                            {
-                                <span class="oi oi-circle-x action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
-                            }
-                            else
-                            {
-                                <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
-                            }
-                            <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
-                            <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                <td>
+                                    @if (@contentRequest.IsComplete)
+                                    {
+                                        <span class="oi oi-circle-x action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
+                                    }
+                                    <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
+                                    <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 }

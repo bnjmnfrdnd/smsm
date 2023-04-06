@@ -145,8 +145,8 @@ else
             <button type="button" @onclick="ShowHideUploadForm" class="btn btn-secondary mb-3">Upload</button>
         </AuthorizeView>
 
-        <div class="card mb-3">
-            <div class="card-body data-card">
+        <div class="card-custom mb-3 p-3">
+            <div class="data-card">
                 <div class="col-12 text-center">
                     <div class="row">
                         <div class="col-lg-3 col-md-12 col-sm-12">
@@ -166,8 +166,8 @@ else
             </div>
         </div>
 
-        <input type="text" class="form-control" @bind="searchQuery" @bind:event="oninput" @onkeyup="SearchTable"></input>
-
+        <div class="card-custom mb-3 p-3">
+        <input type="text" class="form-control" @bind="searchQuery" @bind:event="oninput" @onkeyup="SearchTable" placeholder="Search..."></input>
         <div class="table-responsive">
             <table class="table table-striped">
 
@@ -203,6 +203,7 @@ else
                     }
                 </tbody>
             </table>
+        </div>
         </div>
     }
 }
