@@ -13,12 +13,14 @@ namespace smsm.Data.Services
         private LogService logService;
         private ApplicationDbContext database;
         private UserManager<IdentityUser> userManager;
+        private AuthenticationStateProvider authenticationStateProvider;
 
-        public UserService(ApplicationDbContext database, UserManager<IdentityUser> userManager, LogService logService)
+        public UserService(ApplicationDbContext database, UserManager<IdentityUser> userManager, LogService logService, AuthenticationStateProvider authenticationStateProvider)
         {
             this.database = database;
             this.userManager = userManager;
             this.logService = logService;
+            this.authenticationStateProvider = authenticationStateProvider;
         }
 
         public async Task<List<IdentityUser>> GetUsersAsync()
@@ -31,6 +33,21 @@ namespace smsm.Data.Services
             database.Remove(user);
             await database.SaveChangesAsync();
             return await GetUsersAsync();
+        }
+
+        public async Task<bool> IsCurrentUser(IdentityUser user)
+        {
+            var currentUser = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            var currentUserId = currentUser.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value;
+
+            if (user.Id == currentUserId)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
