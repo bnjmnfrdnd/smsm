@@ -8,73 +8,80 @@
 
     <PageTitle>Settings</PageTitle>
 
-    @if (options == null)
+    @if (userService.IsAdmin().Result)
     {
-        <p><em>Loading...</em></p>
+        @if (options == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row justify-content-evenly">
+                <div class="container col-lg-5 col-md-12 col-sm-12 mt-2">
+                    <div class="row">
+                        <div class="card-custom p-5">
+                            <div class="card-body-custom">
+                                <h4>IMDb API Key</h4>
+                                <div class="form-group mt-3">
+                                    <div class="input-group mb-3">
+                                        <InputText @bind-Value="imdbApiKey" class="form-control"></InputText>
+                                        <div class="input-group-append">
+                                            <input type="button" @onclick='() => SaveOption("IMDB_API_KEY", imdbApiKey)' Class="btn btn-primary" value="Save">
+                                        </div>
+                                    </div>
+                                    <p><span class="oi oi-info"></span> Free tier IMDb accounts only allow up to <b>100</b> API calls per day.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container col-lg-5 col-md-12 col-sm-12 mt-2">
+                    <div class="row">
+                        <div class="card-custom p-5">
+                            <div class="card-body-custom">
+                                <h4>Users</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Email Confirmed</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var user in users)
+                                            {
+                                                <tr>
+                                                    <td>@user.UserName</td>
+                                                    <td>
+                                                        @if (@user.EmailConfirmed)
+                                                        {
+                                                            <span class="oi oi-circle-check" style="color:green"></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="oi oi-circle-x" style="color: red"></span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <span class="oi oi-trash action-buttons" @onclick="() => ShowModal(user)"></span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     }
     else
     {
-        <div class="row justify-content-evenly">
-            <div class="container col-lg-5 col-md-12 col-sm-12 mt-2">
-                <div class="row">
-                    <div class="card-custom p-5">
-                        <div class="card-body-custom">
-                            <h4>IMDb API Key</h4>
-                            <div class="form-group mt-3">
-                                <div class="input-group mb-3">
-                                    <InputText @bind-Value="imdbApiKey" class="form-control"></InputText>
-                                    <div class="input-group-append">
-                                        <input type="button" @onclick='() => SaveOption("IMDB_API_KEY", imdbApiKey)' Class="btn btn-primary" value="Save">
-                                    </div>
-                                </div>
-                                <p><span class="oi oi-info"></span> Free tier IMDb accounts only allow up to <b>100</b> API calls per day.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container col-lg-5 col-md-12 col-sm-12 mt-2">
-                <div class="row">
-                    <div class="card-custom p-5">
-                        <div class="card-body-custom">
-                            <h4>Users</h4>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Username</th>
-                                            <th>Email Confirmed</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var user in users)
-                                        {
-                                            <tr>
-                                                <td>@user.UserName</td>
-                                                <td>
-                                                    @if (@user.EmailConfirmed)
-                                                    {
-                                                        <span class="oi oi-circle-check" style="color:green"></span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="oi oi-circle-x" style="color: red"></span>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <span class="oi oi-trash action-buttons" @onclick="() => ShowModal(user)"></span>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h3>You do not have access to this page.</h3>
     }
 
     <Modal @ref="deleteUserModal">

@@ -1,10 +1,6 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using smsm.Data.Models;
-using System.Security.Claims;
-using System.Web;
 
 namespace smsm.Data.Services
 {
@@ -49,6 +45,20 @@ namespace smsm.Data.Services
             var currentUserId = currentUser.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value;
 
             if (user.Id == currentUserId)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsAdmin()
+        {
+            var firstUser = database.Users.OrderBy(x => x.Id).ToList().First();
+
+            if (IsCurrentUser(firstUser).Result)
             {
                 return true;
             }

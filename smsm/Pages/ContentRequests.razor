@@ -3,6 +3,7 @@
 @using smsm.Data.Models
 @using smsm.Data.Services
 @inject ContentService contentService
+@inject UserService userService
 @using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Requests</PageTitle>
@@ -140,16 +141,23 @@ else
                                 </td>
 
                                 <td>
-                                    @if (@contentRequest.IsComplete)
+                                    @if (userService.IsAdmin().Result)
                                     {
-                                        <span class="oi oi-circle-x action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
-                                    }
-                                    else
-                                    {
-                                        <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
+                                        @if (@contentRequest.IsComplete)
+                                        {
+                                            <span class="oi oi-circle-x action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
+                                        }
                                     }
                                     <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
-                                    <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
+                                    @if (userService.IsAdmin().Result)
+                                    {
+                                        <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
+                                    }
+                                    
                                 </td>
                             </tr>
                         }

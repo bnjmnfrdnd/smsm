@@ -4,6 +4,7 @@
 @using smsm.Data.Services
 @using Microsoft.AspNetCore.Components.Forms
 @inject ContentService contentService
+@inject UserService userService
 
 <PageTitle>Content</PageTitle>
 
@@ -167,43 +168,46 @@ else
         </div>
 
         <div class="card-custom mb-3 p-3">
-        <input type="text" class="form-control" @bind="searchQuery" @bind:event="oninput" @onkeyup="SearchTable" placeholder="Search..."></input>
-        <div class="table-responsive">
-            <table class="table table-striped">
+            <input type="text" class="form-control" @bind="searchQuery" @bind:event="oninput" @onkeyup="SearchTable" placeholder="Search..."></input>
+            <div class="table-responsive">
+                <table class="table table-striped">
 
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Added</th>
-                        <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
-                        <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
-                        <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
-                        <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
-                        <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var content in contentList)
-                    {
+                    <thead>
                         <tr>
-                            <td>@(contentList.IndexOf(content) + 1)</td>
-                            <td>@content.CreatedDateTime.ToShortDateString()</td>
-                            <td>@content.Type</td>
-                            <td>@content.Title</td>
-                            <td>@content.Year</td>
-                            <td>@content.Comments</td>
-                            <td><a href="https://www.imdb.com/title/@content.ImdbId" target="_blank">@(content.ImdbId == null ? "" : content.ImdbId.ToUpper())</a></td>
-                            <td>
-                                <span class="oi oi-pencil action-buttons" @onclick="() => ContentForm(content)"></span>
-                                <span class="oi oi-trash action-buttons" @onclick="() => DeleteContent(content)"></span>
-                            </td>
+                            <th></th>
+                            <th @onclick='() => FilterTable("DATE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Added</th>
+                            <th @onclick='() => FilterTable("TYPE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Type</th>
+                            <th @onclick='() => FilterTable("TITLE")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Title</th>
+                            <th @onclick='() => FilterTable("YEAR")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Year</th>
+                            <th @onclick='() => FilterTable("COMMENTS")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> Comments</th>
+                            <th @onclick='() => FilterTable("IMDBID")' class="column-sorted"><span class="oi oi-arrow-bottom"></span> IMDB ID</th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var content in contentList)
+                        {
+                            <tr>
+                                <td>@(contentList.IndexOf(content) + 1)</td>
+                                <td>@content.CreatedDateTime.ToShortDateString()</td>
+                                <td>@content.Type</td>
+                                <td>@content.Title</td>
+                                <td>@content.Year</td>
+                                <td>@content.Comments</td>
+                                <td><a href="https://www.imdb.com/title/@content.ImdbId" target="_blank">@(content.ImdbId == null ? "" : content.ImdbId.ToUpper())</a></td>
+                                <td>
+                                    @if (userService.IsAdmin().Result)
+                                    {
+                                        <span class="oi oi-pencil action-buttons" @onclick="() => ContentForm(content)"></span>
+                                        <span class="oi oi-trash action-buttons" @onclick="() => DeleteContent(content)"></span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 }
