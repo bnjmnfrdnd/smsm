@@ -30,9 +30,17 @@ namespace smsm.Data.Services
 
         public async Task<List<IdentityUser>> DeleteUser(IdentityUser user)
         {
-            database.Remove(user);
-            await database.SaveChangesAsync();
-            return await GetUsersAsync();
+
+            if (!IsCurrentUser(user).Result)
+            {
+                database.Remove(user);
+                await database.SaveChangesAsync();
+                return await GetUsersAsync();
+            }
+            else
+            {
+                return await GetUsersAsync();
+            }
         }
 
         public async Task<bool> IsCurrentUser(IdentityUser user)

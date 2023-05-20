@@ -1,6 +1,6 @@
 TODO: smsm
 
-Sort logging in/out, first user created is admin byu default,
+Sort logging in/out, first user created is admin by default,
 
 User management screen for admin 
 

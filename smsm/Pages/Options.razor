@@ -52,17 +52,18 @@
                                         {
                                             <tr>
                                                 <td>@user.UserName</td>
-                                                <td>@if (@user.EmailConfirmed)
-                                                {
-                                                    <span class="oi oi-circle-check" style="color:green"></span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="oi oi-circle-x" style="color: red"></span>
-                                                }
+                                                <td>
+                                                    @if (@user.EmailConfirmed)
+                                                    {
+                                                        <span class="oi oi-circle-check" style="color:green"></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="oi oi-circle-x" style="color: red"></span>
+                                                    }
                                                 </td>
                                                 <td>
-                                                    <span class="oi oi-trash action-buttons" @onclick="() => DeleteUser(user)"></span>
+                                                    <span class="oi oi-trash action-buttons" @onclick="() => ShowModal(user)"></span>
                                                 </td>
                                             </tr>
                                         }
@@ -76,11 +77,41 @@
         </div>
     }
 
+    <Modal @ref="deleteUserModal">
+        <ModalContent Centered>
+            <ModalHeader>
+                <ModalTitle>Delete User</ModalTitle>
+                <CloseButton />
+            </ModalHeader>
+            <ModalBody>
+                <Field>
+                    <Label>Are you sure you want to delete this user?</Label>
+                </Field>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="@HideModal">Cancel</Button>
+                <Button Color="Color.Danger" Clicked="@DeleteUser">Continue</Button>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
     @code {
         private List<Option>? options;
         private string imdbApiKey = String.Empty;
-
         private List<IdentityUser> users;
+        private IdentityUser userToBeDeleted;
+        private Modal deleteUserModal;
+
+        private Task ShowModal(IdentityUser user)
+        {
+        userToBeDeleted = user;
+        return deleteUserModal.Show();
+        }
+
+        private Task HideModal()
+        {
+        return deleteUserModal.Hide();
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -98,9 +129,10 @@
         options = await optionService.SaveOptionAsync(type, value);
         }
 
-        async private void DeleteUser(IdentityUser user)
+        async private Task DeleteUser()
         {
-            users = await userService.DeleteUser(user);
+        users = await userService.DeleteUser(userToBeDeleted);
+        HideModal();
         }
     }
 </AuthorizeView>
