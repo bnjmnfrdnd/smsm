@@ -1,13 +1,12 @@
 TODO: smsm
 
-Sort logging in/out, first user created is admin by default,
-
-User management screen for admin 
-
-Add admin priveledges to certain areas of the site i.e. logs
-
 Paginate tables
 
 After uploading file, the page needs to switch back to the list
 
 Remove duplicate requests
+
+Email functionality? or notifications for users 
+
+Things to note:
+The first user created is the admin 

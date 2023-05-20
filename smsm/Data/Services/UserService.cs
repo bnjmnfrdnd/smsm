@@ -39,6 +39,14 @@ namespace smsm.Data.Services
             }
         }
 
+        public async Task<string> GetCurrentUserEmail()
+        {
+            var currentUser = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            var currentUserEmail = currentUser.Identity.Name;
+
+            return currentUserEmail;
+        }
+
         public async Task<bool> IsCurrentUser(IdentityUser user)
         {
             var currentUser = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;

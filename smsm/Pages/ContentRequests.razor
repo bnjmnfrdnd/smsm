@@ -80,8 +80,14 @@ else
     }
     else
     {
-
-        <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
+        @if (userService.GetCurrentUserEmail().Result != null)
+        {
+            <button type="button" @onclick="() => ContentRequestForm(null)" class="btn btn-primary mb-3">New Request</button>
+        }
+        else
+        {
+            <h4 class="fw-bold mb-3">Please login or create an account to request content.</h4>
+        }
 
         <div class="card-custom mb-3 p-3">
             <div class="data-card">
@@ -152,7 +158,10 @@ else
                                             <span class="oi oi-circle-check action-buttons" @onclick="() => ChangeContentRequestStatus(contentRequest.Id)"></span>
                                         }
                                     }
-                                    <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
+                                    @if (userService.GetCurrentUserEmail().Result != null)
+                                    {
+                                        <span class="oi oi-pencil action-buttons" @onclick="() => ContentRequestForm(contentRequest)"></span>
+                                    }
                                     @if (userService.IsAdmin().Result)
                                     {
                                         <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>

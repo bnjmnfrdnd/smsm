@@ -10,15 +10,17 @@ namespace smsm.Data.Services
     public class ContentService
     {
         private LogService logService;
+        private UserService userService;
         private ApplicationDbContext database;
         private IMDbService IMDbService;
         TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-        public ContentService(ApplicationDbContext database, LogService logService, IMDbService IMDbService)
+        public ContentService(ApplicationDbContext database, LogService logService, IMDbService IMDbService, UserService userService)
         {
             this.database = database;
             this.logService = logService;
             this.IMDbService = IMDbService;
+            this.userService = userService;
         }
 
         public async Task<List<Content>> UploadFileAsync(string file)
@@ -120,6 +122,7 @@ namespace smsm.Data.Services
         {
             try
             {
+                var currentUserEmail = userService.GetCurrentUserEmail().Result;
                 string apiKey = database.Options.FirstOrDefault(x => x.Type == "IMDB_API_KEY")?.Value;
                 if (contentRequest.Title == "" && contentRequest.Title == null)
                 {
@@ -149,7 +152,7 @@ namespace smsm.Data.Services
                     contentRequest.Title = contentRequest.Title == null ? "" : contentRequest.Title;
                     contentRequest.Year = contentRequest.Year == null ? "" : contentRequest.Year;
                     contentRequest.ImdbId = contentRequest.ImdbId == null ? "" : contentRequest.ImdbId;
-                    contentRequest.UserName = "";
+                    contentRequest.UserName = currentUserEmail;
                     contentRequest.UserId = 0;
 
                     database.Add(contentRequest);
