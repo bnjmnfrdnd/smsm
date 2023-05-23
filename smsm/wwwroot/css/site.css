@@ -8,6 +8,10 @@ h1:focus {
     outline: none;
 }
 
+.btn {
+    border-radius: 25px;
+}
+
 a, .btn-link {
     color: #0071c1;
 }

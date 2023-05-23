@@ -86,7 +86,15 @@ else
         }
         else
         {
-            <h4 class="fw-bold mb-3">Please login or create an account to request content.</h4>
+            <div class="card-custom p-3 mb-3 border-1">
+                <div class="data-card">
+                    <div class="col-12 text-center">
+                        <div class="row">
+                            <h4 class="fw-bold">Please login or create an account to request content.</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
 
         <div class="card-custom mb-3 p-3">
@@ -166,7 +174,7 @@ else
                                     {
                                         <span class="oi oi-trash action-buttons" @onclick="() => DeleteContentRequest(contentRequest)"></span>
                                     }
-                                    
+
                                 </td>
                             </tr>
                         }

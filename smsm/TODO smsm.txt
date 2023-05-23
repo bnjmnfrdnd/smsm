@@ -7,6 +7,7 @@ After uploading file, the page needs to switch back to the list
 Remove duplicate requests
 
 Email functionality? or notifications for users 
+ - Add notification page and notification table to db
 
 Things to note:
 The first user created is the admin 
